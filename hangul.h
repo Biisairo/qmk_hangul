@@ -5,6 +5,9 @@
 
 typedef uint32_t ucschar;
 
+ucschar getChoseong(char c);
+ucschar getJongseong(char c);
+
 int hangul_is_syllable(ucschar c);
 int hangul_is_choseong_conjoinable(ucschar c);
 int hangul_is_jungseong_conjoinable(ucschar c);
