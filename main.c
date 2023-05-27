@@ -1,0 +1,137 @@
+#include "hangul.h"
+#include <stdio.h>
+
+#include <wchar.h>
+#include <locale.h>
+
+ucschar table_choseong[26] = {
+	0x1106, // a
+	0x1172, // b
+	0x110E, // c
+	0x110B, // d
+	0x1103, // e
+	0x1105, // f
+	0x1112, // g
+	0x1169, // h
+	0x1163, // i
+	0x1165, // j
+	0x1161, // k
+	0x1175, // l
+	0x1173, // m
+	0x116E, // n
+	0x1162, // o
+	0x1166, // p
+	0x1107, // q
+	0x1100, // r
+	0x1102, // s
+	0x1109, // t
+	0x1167, // u
+	0x1111, // v
+	0x110C, // w
+	0x1110, // x
+	0x116D, // y
+	0x110F, // z
+};
+
+ucschar table_choseong_ssang[26] = {
+	0x1106, // a
+	0x1172, // b
+	0x110E, // c
+	0x110B, // d
+	0x1104, // e
+	0x1105, // f
+	0x1112, // g
+	0x1169, // h
+	0x1163, // i
+	0x1165, // j
+	0x1161, // k
+	0x1175, // l
+	0x1173, // m
+	0x116E, // n
+	0x1162, // o
+	0x1166, // p
+	0x1108, // q
+	0x1101, // r
+	0x1102, // s
+	0x1109, // t
+	0x1167, // u
+	0x1111, // v
+	0x110D, // w
+	0x1110, // x
+	0x116D, // y
+	0x110F, // z
+};
+
+ucschar table_jongseong[26] = {
+	0x11B7, // a
+	0x1172, // b
+	0x11BE, // c
+	0x11BC, // d
+	0x11AE, // e
+	0x11AF, // f
+	0x11C2, // g
+	0x1169, // h
+	0x1163, // i
+	0x1165, // j
+	0x1161, // k
+	0x1175, // l
+	0x1173, // m
+	0x116E, // n
+	0x1162, // o
+	0x1166, // p
+	0x11B8, // q
+	0x11A8, // r
+	0x11AB, // s
+	0x11BA, // t
+	0x1167, // u
+	0x11C1, // v
+	0x11BD, // w
+	0x11C0, // x
+	0x116D, // y
+	0x11BF, // z
+};
+
+ucschar table_jongseong_ssang[26] = {
+	0x11B7, // a
+	0x1172, // b
+	0x11BE, // c
+	0x11BC, // d
+	0x11AE, // e
+	0x11AF, // f
+	0x11C2, // g
+	0x1169, // h
+	0x1163, // i
+	0x1165, // j
+	0x1161, // k
+	0x1175, // l
+	0x1173, // m
+	0x116E, // n
+	0x1162, // o
+	0x1166, // p
+	0x11B8, // q
+	0x11A9, // r
+	0x11AB, // s
+	0x11BB, // t
+	0x1167, // u
+	0x11C1, // v
+	0x11BD, // w
+	0x11C0, // x
+	0x116D, // y
+	0x11BF, // z
+};
+
+int main()
+{
+	char* input = "rlaehddbs";
+
+	ucschar	 syll = 0xac01;
+	ucschar choseong[1];
+	ucschar jungseong[1];
+	ucschar jongseong[1];
+
+	hangul_syllable_to_jamo(syll, choseong, jungseong, jongseong);
+
+	ucschar syll2 = hangul_jamo_to_syllable(*choseong, *jungseong, *jongseong);
+
+	printf("%X\n", syll2);
+}
