@@ -137,16 +137,24 @@ int hangul_is_syllable(ucschar c) {
     return c >= 0xac00 && c <= 0xd7a3;
 }
 
-int hangul_is_choseong_conjoinable(ucschar c) {
+int hangul_is_choseong(ucschar c) {
     return c >= 0x1100 && c <= 0x1112;
 }
 
-int hangul_is_jungseong_conjoinable(ucschar c) {
+int hangul_is_jungseong(ucschar c) {
     return c >= 0x1161 && c <= 0x1175;
 }
 
-int hangul_is_jongseong_conjoinable(ucschar c) {
+int hangul_is_jongseong(ucschar c) {
     return c >= 0x11a7 && c <= 0x11c2;
+}
+
+int hangul_is_combining_mark(ucschar c)
+{
+    return  c == 0x302e || c == 0x302f  ||
+	   (c >= 0x0300 && c <= 0x036F) ||
+	   (c >= 0x1dc0 && c <= 0x1dff) ||
+	   (c >= 0xfe20 && c <= 0xfe2f);
 }
 
 void hangul_syllable_to_jamo(ucschar syllable, ucschar* choseong, ucschar* jungseong, ucschar* jongseong) {
@@ -185,11 +193,11 @@ ucschar hangul_jamo_to_syllable(ucschar choseong, ucschar jungseong, ucschar jon
     if (jongseong == 0)
 	jongseong = 0x11a7;         /* Jongseong filler */
 
-    if (!hangul_is_choseong_conjoinable(choseong))
+    if (!hangul_is_choseong(choseong))
 	return 0;
-    if (!hangul_is_jungseong_conjoinable(jungseong))
+    if (!hangul_is_jungseong(jungseong))
 	return 0;
-    if (!hangul_is_jongseong_conjoinable(jongseong))
+    if (!hangul_is_jongseong(jongseong))
 	return 0;
 
     choseong  -= choseong_base;
@@ -199,4 +207,56 @@ ucschar hangul_jamo_to_syllable(ucschar choseong, ucschar jungseong, ucschar jon
     c = ((choseong * njungseong) + jungseong) * njongseong + jongseong
 	+ syllable_base;
     return c;
+}
+
+int is_syllable_boundary(ucschar prev, ucschar next)
+{
+    if (hangul_is_choseong(prev)) {
+	if (hangul_is_choseong(next))
+	    return 0;
+	if (hangul_is_jungseong(next))
+	    return 0;
+	if (hangul_is_syllable(next))
+	    return 0;
+	if (hangul_is_combining_mark(next))
+	    return 0;
+	if (next == HANGUL_JUNGSEONG_FILLER)
+	    return 0;
+    } else if (prev == HANGUL_CHOSEONG_FILLER) {
+	if (hangul_is_jungseong(next))
+	    return 0;
+	if (next == HANGUL_JUNGSEONG_FILLER)
+	    return 0;
+    } else if (hangul_is_jungseong(prev)) {
+	if (hangul_is_jungseong(next))
+	    return 0;
+	if (hangul_is_jongseong(next))
+	    return 0;
+	if (hangul_is_combining_mark(next))
+	    return 0;
+    } else if (prev == HANGUL_JUNGSEONG_FILLER) {
+	if (hangul_is_jongseong(next))
+	    return 0;
+    } else if (hangul_is_jongseong(prev)) {
+	if (hangul_is_jongseong(next))
+	    return 0;
+	if (hangul_is_combining_mark(next))
+	    return 0;
+    } else if (hangul_is_syllable(prev)) {
+	if ((prev - syllable_base) % njongseong == 0) {
+	    // 종성이 없는 음절: LV
+	    if (hangul_is_jungseong(next))
+		return 0;
+	    if (hangul_is_jongseong(next))
+		return 0;
+	} else {
+	    // 종성이 있는 음절: LVT
+	    if (hangul_is_jongseong(next))
+		return 0;
+	}
+	if (hangul_is_combining_mark(next))
+	    return 0;
+    }
+
+    return 1;
 }

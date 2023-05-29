@@ -17,5 +17,8 @@ int main()
 
 	ucschar syll2 = hangul_jamo_to_syllable(*choseong, *jungseong, *jongseong);
 
-	printf("%X\n", syll2);
+	ucschar str[1];
+	str[0] = syll2;
+
+	printf("%s\n", str);
 }

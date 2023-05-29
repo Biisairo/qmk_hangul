@@ -1,25 +1,43 @@
 #include "hangul.h"
 
-int isLowerCase(char c) {
-	if ('a' <= c && c <= 'z')
-		return 1;
-	return 0;
+typedef struct hangulBuffer {
+	ucschar choseong;
+	ucschar jungseong;
+	ucschar jongseong;
+} hangulBuffer;
+
+struct *hangulBuffer getHangulBuffer() {
+	static hangulBuffer buf;
+	return &buf;
+}
+
+void clearBuffer() {
+	hangulBuffer *buffer = getHangulBuffer();
+	buffer->choseong = 0;
+	buffer->jungseong = 0;
+	buffer->jongseong = 0;
 }
 
 ucschar output(char c) {
-	static ucschar pre;
+	hangulBuffer *buffer = getHangulBuffer();
 
-	ucschar choseong[1];
-	ucschar jungseong[1];
-	ucschar jongseong[1];
+	ucschar tmp;
 
-	hangul_syllable_to_jamo(pre, choseong, jungseong, jongseong);
+	ucschar cho = buffer->choseong;
+	ucschar jung = buffer->jungseong;
+	ucschar jong = buffer->jongseong;
 
-	if (*choseong == 0) {
-		pre = getChoseong(c);
-		return pre;
+	if (cho) {
+		if (jung) {
+			if (jong) {
+
+			}
+		}
+		tmp = getChoseong(c);
+		if (hangul_is_choseong(tmp))
+			buffer->choseong = tmp;
+		return tmp;
 	}
-
 
 	if (*choseong && !(*jungseong)) {
 		if ()
